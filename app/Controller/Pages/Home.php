@@ -1,6 +1,7 @@
 <?php
 namespace App\Controller\Pages;
 use \App\Utils\View;
+use \App\Model\Entity\Organization;
 
 class Home extends Page
 {
@@ -11,10 +12,13 @@ class Home extends Page
      */
     public static function getHome()
     {
+        // NOVA INSTANCIA DA ORGANIZATION
+        $obOrganization = new Organization;
+        
         // VIEW DA HOME
         $content = View::render("pages" . DS . "home", array(
-            "name" => "WDEV - MVC em PHP",
-            "description" => "Canal do Youtube: https://youtube.com.br/wdevoficial"
+            "name" => $obOrganization -> name,
+            "description" => $obOrganization -> description
         ));
 
         // VIEW DA PAGE
