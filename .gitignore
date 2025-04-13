@@ -1,0 +1,9 @@
+**doc
+**doc/
+**doc/**
+**vendor
+**vendor/
+**vendor/**
+**~
+**#
+composer.lock
