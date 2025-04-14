@@ -1,5 +1,7 @@
 <?php
 namespace App\Http;
+use \Closure;
+use \Exception;
 
 class Router
 {
@@ -56,15 +58,27 @@ class Router
      */
     private function addRoute($method, $route, $params = array())
     {
+        // VALIDACAO DOS PARAMS
+        foreach ($params as $key => $value)
+        {
+            if ($value instanceof Closure)
+            {
+                $params['controller'] = $value;
+                unset($params[$key]);
+                continue;
+            }
+        }
+        
+        // PADRAO PARA VALIDAR URL
+        $patternRoute = '/^' . str_replace('/', '\/', $route) . '$/';
+
+        // ADICIONAR ROTA DENTRO DA CLASSE
+        $this -> routes[$patternRoute][$method] = $params;
+
         echo "<pre>";
-        print_r($method);
+        print_r($this);
         echo "</pre>";
-        echo "<pre>";
-        print_r($route);
-        echo "</pre>";
-        echo "<pre>";
-        print_r($params);
-        echo "</pre>";
+
     }
 
     /*
@@ -75,6 +89,17 @@ class Router
     public function get ($route, $params = array())
     {
         $this -> addRoute("GET", $route, $params);
+    }
+
+    public function run ()
+    {
+        try
+        {
+            throw new Exception ("Página não encontrada", 404);
+        } catch (Exception $e)
+        {
+            return new Response ($e -> getCode(), $e -> getMessage());
+        }
     }
 }
 ?>

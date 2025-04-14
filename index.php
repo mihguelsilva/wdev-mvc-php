@@ -10,9 +10,13 @@ use \App\Controller\Pages\Home;
 
 $obRouter = new Router(URL);
 
+
 // ROTA HOME
 $obRouter -> get("/", array(function(){
     return Home::getHome();
 }
 ));
+
+
+$obRouter -> run() -> sendResponse();
 ?>
