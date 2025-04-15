@@ -74,11 +74,53 @@ class Router
 
         // ADICIONAR ROTA DENTRO DA CLASSE
         $this -> routes[$patternRoute][$method] = $params;
+    }
 
-        echo "<pre>";
-        print_r($this);
-        echo "</pre>";
+    /*
+      Método responsável por retornar URI, desconsiderando o prefixo
+     */
+    private function getUri()
+    {
+        // PUXAR URI DA REQUEST
+        $uri = $this -> request -> getUri();
 
+        // SEPARAR URI EM PARTES
+        $xUri = strlen($this -> prefix) ? explode($this -> prefix, $uri) : array($uri);
+
+        // RETORNA URI SEM PREFIXO
+        return end($xUri);
+    }
+
+    /*
+      Método responsável por retornar os parâmetros da rota atual
+     */
+    private function getRoute()
+    {
+        // URI
+        $uri = $this -> getUri();
+
+        // METODO HTTP
+        $httpMethod = $this -> request -> getHttpMethod();
+
+        // VALIDAR ROTAS
+        foreach ($this -> routes as $patternRoute => $methods)
+        {
+            // VERIFICA SE A ROTA BATE COM O PADRAO
+            if (preg_match($patternRoute, $uri))
+            {
+                // VERIFICAR METODO
+                if ($methods[$httpMethod])
+                {
+                    // RETORNAR PARAMETROS DA ROTA
+                    return $methods[$httpMethod];
+                }
+
+                // METODO NAO ENCONTRADO PARA A ROTA REQUISITADA
+                throw new Exception("Método não permitido", 405);
+            }
+        }
+        // URL NAO ENCONTRADA
+        throw new Exception("Página não encontrada", 404);
     }
 
     /*
@@ -91,11 +133,52 @@ class Router
         $this -> addRoute("GET", $route, $params);
     }
 
+    /*
+      Método responsável por definir uma rota POST
+      @param string $route
+      @param array $params
+     */
+    public function post ($route, $params = array())
+    {
+        $this -> addRoute("POST", $route, $params);
+    }
+
+    /*
+      Método responsável por definir uma rota PUT
+      @param string $route
+      @param array $params
+     */
+    public function put ($route, $params = array())
+    {
+        $this -> addRoute("PUT", $route, $params);
+    }
+
+    /*
+      Método responsável por definir uma rota DELETE
+      @param string $route
+      @param array $params
+     */
+    public function delete ($route, $params = array())
+    {
+        $this -> addRoute("DELETE", $route, $params);
+    }
+
     public function run ()
     {
         try
         {
-            throw new Exception ("Página não encontrada", 404);
+            $route = $this -> getRoute();
+
+            if ((!isset($route['controller'])))
+            {
+                throw new Exception("A URL não pôde ser processada", 500);
+            }
+
+            // ARGUMENTOS DA FUNCAO
+            $args = array();
+
+            return call_user_func_array($route['controller'], $args);
+            
         } catch (Exception $e)
         {
             return new Response ($e -> getCode(), $e -> getMessage());

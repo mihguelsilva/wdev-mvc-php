@@ -41,6 +41,31 @@ class Request
         $this -> queryParams = $_GET ?? array();
         $this -> postVars = $_POST ?? array();
     }
+
+    public function getHttpMethod()
+    {
+        return $this -> methodHttp;
+    }
+
+    public function getUri()
+    {
+        return $this -> uri;
+    }
+
+    public function getHeaders()
+    {
+        return $this -> headers;
+    }
+
+    public function getQueryParams()
+    {
+        return $this -> queryParams;
+    }
+
+    public function getPostVars()
+    {
+        return $this -> postVars;
+    }
 }
 ?>
 
